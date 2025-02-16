@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -16,6 +17,11 @@ public class MemberController {
 
     private final MemberService memberService;
 
+    @GetMapping("/member/login")
+    public String login() {
+
+        return "member/login";
+    }
 
     @GetMapping("/member/register")
     public String register(){
@@ -27,7 +33,7 @@ public class MemberController {
     //request WEB ->SERVER
     //response SERVER ->WEB
     @PostMapping("/member/register")
-    public String registerSubmit(HttpServletRequest request, HttpServletResponse response, MemberInput memberInput){
+    public String registerSubmit(Model model, HttpServletRequest request, HttpServletResponse response, MemberInput memberInput){
 
 
         /*
@@ -51,7 +57,24 @@ public class MemberController {
         /*
          */
         boolean result = memberService.register(memberInput);
+        model.addAttribute("result", result);
         System.out.println(result);
         return "member/register_complete";
+    }
+
+    @GetMapping("/member/email-auth")
+    public String emailAuth(Model model, HttpServletRequest request){
+        String uuid = request.getParameter("id");
+
+        boolean result = memberService.emailAuth(uuid);
+        model.addAttribute("result", result);
+
+        return "/member/email_auth";
+    }
+
+    @GetMapping("/member/info")
+    public String memberInfo(){
+
+        return "/member/info";
     }
 }
