@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequiredArgsConstructor
@@ -17,11 +18,13 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @GetMapping("/member/login")
+    @RequestMapping("/member/login")
     public String login() {
 
-        return "member/login";
+        return "member/login";  // 로그인 페이지를 반환
     }
+
+
 
     @GetMapping("/member/register")
     public String register(){

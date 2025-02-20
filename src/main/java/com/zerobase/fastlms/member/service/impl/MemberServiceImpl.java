@@ -11,6 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -36,18 +37,21 @@ public class MemberServiceImpl implements MemberService {
             // 현재 userId에 해당하는 데이터 존재
             return false;
         }
+        String enPassword = BCrypt.hashpw(memberInput.getPassword(), BCrypt.gensalt());
         String uuid = UUID.randomUUID().toString();
+
         Member member = Member.builder()
                 .userId(memberInput.getUserId())
                 .userName(memberInput.getUserName())
                 .phone(memberInput.getPhone())
-                .password(memberInput.getPassword())
+                .password(enPassword)
                 .regDt(memberInput.getRegDt())
                 .emailAuthYn(false)
                 .emailAuthKey(uuid)
                 .build();
 
         memberRepository.save(member);
+
 
         String mail = memberInput.getUserId();
         String subject = "fastlms 사이트 가입을 축하드립니다.";
@@ -79,7 +83,7 @@ public class MemberServiceImpl implements MemberService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
 
-        Optional<Member> optionalMember = memberRepository.findByEmailAuthKey(username);
+        Optional<Member> optionalMember = memberRepository.findById(username);
         if(!optionalMember.isPresent()){
             throw new UsernameNotFoundException("회원정보가 존재하지 않습니다.");
         }
@@ -88,10 +92,6 @@ public class MemberServiceImpl implements MemberService {
 
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-
-
-
-
 
         return new User(member.getUserId(), member.getPassword(), grantedAuthorities );
     }
